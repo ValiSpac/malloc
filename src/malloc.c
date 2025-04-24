@@ -4,14 +4,12 @@ void *initialize_malloc(size_t size)
 {
     t_heap  *heap;
     t_block *block;
-    void    *res;
+    size_t  zone_size;
 
-    if (size == NULL)
+    if (!size)
         return NULL;
-
-    size_t aligned_size = ALIGN(size);
-    if (!(heap = determine_zone(aligned_size)))
-        create_heap(aligned_size);
+    size_t total_block_size = ALIGN(size) + sizeof(t_block);
+    heap = get_available_heap(total_block_size);
 }
 
 void *malloc(size_t size)
