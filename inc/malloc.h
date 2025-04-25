@@ -47,6 +47,7 @@ extern t_heap           *g_first_heap;
 
 void        setup_block(t_block *block, size_t size);
 t_heap      *get_available_heap(size_t block_size);
-void        *add_new_block_to_heap(t_heap *heap, size_t size);
+t_block     *get_available_block(size_t size);
+t_block     *add_new_block_to_heap(t_heap *heap, size_t size);
 void        print_size(size_t n);
 size_t      get_system_limit();

@@ -70,7 +70,10 @@ void add_heap_to_list(t_heap *new_heap)
     }
     t_heap *tmp = g_first_heap;
     while (tmp->next)
+    {
         tmp = tmp->next;
+        write(2,"-\n", 3);
+    }
     tmp->next = new_heap;
     new_heap->prev = tmp;
 }
@@ -84,8 +87,10 @@ t_heap  *get_available_heap(size_t block_size)
 
     heap = find_heap(determine_zone(block_size), block_size, first_heap);
     if (!heap)
+    {
         if (!(heap = create_heap(block_size)))
             return NULL;
-    add_heap_to_list(heap);
+        add_heap_to_list(heap);
+    }
     return heap;
 }

@@ -7,7 +7,10 @@
 int main(void)
 {
     char *ptr = malloc(256);
-    if (!ptr)
+    char *ptr1 = malloc(256);
+    char *ptr2 = malloc(256);
+    char *ptr3 = malloc(1698);
+    if (!ptr || !ptr1 || !ptr2 || !ptr3)
     {
         dprintf(2,"%i\n", errno);
         return 1;
