@@ -70,10 +70,7 @@ void add_heap_to_list(t_heap *new_heap)
     }
     t_heap *tmp = g_first_heap;
     while (tmp->next)
-    {
         tmp = tmp->next;
-        write(2,"-\n", 3);
-    }
     tmp->next = new_heap;
     new_heap->prev = tmp;
 }

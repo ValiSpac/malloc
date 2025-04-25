@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdint.h>
 
 #define HEAP_OFFSET(start) ((void *)start + sizeof(t_heap))
 #define BLOCK_OFFSET(start) ((void *)start + sizeof(t_block))
@@ -40,7 +41,8 @@ typedef struct s_heap {
     size_t          block_count;
     t_heap_type     zone;
     t_block         *first_block;
-} t_heap;
+    uint8_t         _pad[8];//padding so the struct is aligned to 16 bytes
+}__attribute__((aligned(16))) t_heap;
 
 extern pthread_mutex_t  g_mutex_lock;
 extern t_heap           *g_first_heap;
