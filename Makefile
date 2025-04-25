@@ -26,7 +26,7 @@ TESTFLAGS   := -Wall -Wextra -Werror -Iinc -I$(LIBFT_DIR)
 all: $(NAME) $(LINK_NAME)
 
 $(NAME): libft $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS) -L$(LIBFT_DIR) -lft
+	@$(CC) $(LDFLAGS) -o $@ $(OBJS) -L$(LIBFT_DIR) -lft
 
 
 $(LINK_NAME): $(NAME)

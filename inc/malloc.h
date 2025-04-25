@@ -14,16 +14,23 @@
 //pagesize on OS 4096B
 //pagesize * 4 = 16 kB
 //pagesize * 32 = 128 kB
-#define TINY_ZONE_SIZE (getpagesize() * 4)
-#define SMALL_ZONE_SIZE (getpagesize() * 32)
-#define TINY_BLOCK_SIZE (TINY_ZONE_SIZE / 128) //128B per block
-#define SMALL_BLOCK_SIZE (SMALL_ZONE_SIZE / 128) //1024B per block
+#define TINY_ZONE_SIZE (size_t)(getpagesize() * 4)
+#define SMALL_ZONE_SIZE (size_t)(getpagesize() * 32)
+#define TINY_BLOCK_SIZE (size_t)(TINY_ZONE_SIZE / 128) //128B per block
+#define SMALL_BLOCK_SIZE (size_t)(SMALL_ZONE_SIZE / 128) //1024B per block
 
 typedef enum e_heap_type {
     HEAP_TINY,
     HEAP_SMALL,
     HEAP_LARGE
 } t_heap_type;
+
+typedef struct s_block{
+    struct s_block  *prev;
+    struct s_block  *next;
+    size_t          size;
+    int             free;
+} t_block;
 
 typedef struct s_heap {
     struct s_heap   *prev;
@@ -35,15 +42,11 @@ typedef struct s_heap {
     t_block         *first_block;
 } t_heap;
 
-typedef struct s_block{
-    struct s_block  *prev;
-    struct s_block  *next;
-    size_t          size;
-    int             free;
-} t_block;
-
-extern pthread_mutex_t g_mutex_lock;
-extern t_heap *g_first_heap;
+extern pthread_mutex_t  g_mutex_lock;
+extern t_heap           *g_first_heap;
 
 void        setup_block(t_block *block, size_t size);
+t_heap      *get_available_heap(size_t block_size);
+void        *add_new_block_to_heap(t_heap *heap, size_t size);
+void        print_size(size_t n);
 size_t      get_system_limit();
