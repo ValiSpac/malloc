@@ -35,9 +35,71 @@ t_block    *add_new_block_to_heap(t_heap *heap, size_t size)
     return new_block;
 }
 
-t_block *get_available_block(t_heap *heap, size_t size)
+void    defragment_blocks(t_heap *heap)
 {
-    (void)size;
+    while (heap)
+    {
+        t_block *block = HEAP_OFFSET(heap);
+        while (block && block->next)
+        {
+            if (block->free && block->next->free)
+            {
+                block->size += sizeof(t_block) + block->next->size;
+                block->next = block->next->next;
+                if (block->next)
+                    block->next->prev = block;
+            }
+            else
+                block = block->next;
+        }
+        heap = heap->next;
+    }
+}
+
+t_block *split_block(t_block *block,size_t size, t_heap *heap)
+{
+    size_t  total_size = size + sizeof(t_block);
+    t_block *new;
+    if (block->size >= total_size + sizeof(t_block) + 16)
+    {
+        new = (t_block *)BLOCK_OFFSET(block) + size;
+        new->size = block->size - size - sizeof(t_block);
+        new->free = 1;
+        new->next = block->next;
+        new->prev = block;
+        if (block->next)
+            block->next->prev = new;
+        block->next = new;
+        block->size = size;
+        heap->block_count++;
+        heap->free_size -= sizeof(t_block);
+    }
+    block->free = 0;
+    heap->free_size -= block->size;
+    return block;
+}
+
+t_block *get_available_block(size_t size)
+{
+    t_heap  *heap;
+    t_block *block;
+
+    t_heap_type zone = determine_zone(size);
+    heap = g_first_heap;
+    defragment_blocks(heap);
+    while (heap)
+    {
+        block = HEAP_OFFSET(heap);
+        while (heap->zone == zone && block)
+        {
+            if (block->free && block->size >= size)
+                return split_block(block, size, heap);
+            block = block->next;
+        }
+        heap = heap->next;
+    }
+
+
     return NULL;
 }
 

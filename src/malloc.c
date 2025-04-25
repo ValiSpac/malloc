@@ -12,12 +12,12 @@ void *initialize_malloc(size_t size)
     if (!size)
         return NULL;
     size_t aligned_size = ALIGN(size);
-    heap = get_available_heap(aligned_size);
-    if (!heap)
-        return NULL;
     block = get_available_block(aligned_size);
     if (block)
         return BLOCK_OFFSET(block);
+    heap = get_available_heap(aligned_size);
+    if (!heap)
+        return NULL;
     print_size(heap->total_size);
     block = add_new_block_to_heap(heap, size);
     print_size(heap->free_size);
