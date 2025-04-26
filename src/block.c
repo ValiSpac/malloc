@@ -29,7 +29,7 @@ t_block    *add_new_block_to_heap(t_heap *heap, size_t size)
         last->next = new_block;
     else
         heap->first_block = new_block;
-    heap->free_size -= sizeof(t_block) + new_block->size;
+    heap->free_size -= (sizeof(t_block) + new_block->size);
     heap->block_count++;
 
     return new_block;
@@ -44,13 +44,16 @@ void    defragment_blocks(t_heap *heap)
         {
             if (block->free && block->next->free)
             {
-                block->size += sizeof(t_block) + block->next->size;
-                block->next = block->next->next;
-                if (block->next)
-                    block->next->prev = block;
+                t_block *next = block->next;
+                block->size += sizeof(t_block) + next->size;
+                block->next = next->next;
+                if (next->next)
+                    next->next->prev = block;
+                heap->block_count--;
+                heap->free_size += sizeof(t_block);
+                continue;
             }
-            else
-                block = block->next;
+            block = block->next;
         }
         heap = heap->next;
     }
@@ -75,7 +78,7 @@ t_block *split_block(t_block *block,size_t size, t_heap *heap)
         heap->free_size -= sizeof(t_block);
     }
     block->free = 0;
-    heap->free_size -= block->size;
+    heap->free_size -= block->size - sizeof(t_block);
     return block;
 }
 

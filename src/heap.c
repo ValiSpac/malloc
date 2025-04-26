@@ -1,13 +1,30 @@
 #include "../inc/malloc.h"
 
-t_heap_type determine_zone(size_t size)
+int is_heap_empty(t_heap *heap)
 {
-    if (size <= TINY_BLOCK_SIZE)
-        return HEAP_TINY;
-    else if (size <= SMALL_BLOCK_SIZE)
-        return HEAP_SMALL;
-    else
-        return HEAP_LARGE;
+    t_block *block;
+    block = heap->first_block;
+    while (block)
+    {
+        if (block->free == 1)
+            return 0;
+        block = block->next;
+    }
+    return 1;
+}
+
+t_heap *find_heap_from_block(t_block *block)
+{
+    t_heap *heap = g_first_heap;
+    while (heap)
+    {
+        void *start = (void *)heap;
+        void *end = start + heap->total_size;
+        if ((void *)block > start && (void *)block < end)
+            return heap;
+        heap = heap->next;
+    }
+    return NULL;
 }
 
 size_t get_heap_size_from_block(size_t size)
@@ -39,11 +56,6 @@ t_heap *create_heap(size_t size)
     heap->total_size = heap_size;
     heap->free_size = heap_size - sizeof(t_heap);
     heap->block_count = 0;
-    const char *zone_names[] = { "TINY", "SMALL", "LARGE" };//don't forget to remove
-    write(1, "Creating heap: ", 16);
-    write(1, zone_names[heap->zone], ft_strlen(zone_names[heap->zone]));
-    write(1, "\n", 1);//testing for heap creation
-
     return heap;
 }
 

@@ -47,10 +47,17 @@ typedef struct s_heap {
 extern pthread_mutex_t  g_mutex_lock;
 extern t_heap           *g_first_heap;
 
+void        *malloc(size_t size);
+void        free(void *ptr);
+
+
 void        setup_block(t_block *block, size_t size);
 t_heap      *get_available_heap(size_t block_size);
 t_block     *get_available_block(size_t size);
 t_heap_type determine_zone(size_t size);
+void        defragment_blocks(t_heap *heap);
 t_block     *add_new_block_to_heap(t_heap *heap, size_t size);
 void        print_size(size_t n);
+int         is_heap_empty(t_heap *heap);
+t_heap      *find_heap_from_block(t_block *block);
 size_t      get_system_limit();

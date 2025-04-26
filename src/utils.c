@@ -30,3 +30,13 @@ void    print_size(size_t n)
     }
     write(1, &buf[i + 1], 20 - i);
 }
+
+t_heap_type determine_zone(size_t size)
+{
+    if (size <= TINY_BLOCK_SIZE)
+        return HEAP_TINY;
+    else if (size <= SMALL_BLOCK_SIZE)
+        return HEAP_SMALL;
+    else
+        return HEAP_LARGE;
+}

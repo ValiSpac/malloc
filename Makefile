@@ -49,6 +49,9 @@ $(TESTBIN): $(TESTSRC)
 run: all test
 	@LD_PRELOAD=./$(LINK_NAME) ./$(TESTBIN)
 
+valgrind: all test
+	@LD_PRELOAD=./$(LINK_NAME) valgrind ./$(TESTBIN)
+
 clean:
 	@rm -rf $(OBJDIR)
 
