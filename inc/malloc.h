@@ -57,6 +57,8 @@ t_block     *get_available_block(size_t size);
 t_heap_type determine_zone(size_t size);
 void        defragment_blocks(t_heap *heap);
 t_block     *add_new_block_to_heap(t_heap *heap, size_t size);
+t_block     *split_block(t_block *block,size_t size, t_heap *heap);
+int         grow_into_next_block(t_block *block, t_heap *heap, size_t size);
 void        print_size(size_t n);
 int         is_heap_empty(t_heap *heap);
 t_heap      *find_heap_from_block(t_block *block);

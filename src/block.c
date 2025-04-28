@@ -78,7 +78,7 @@ t_block *split_block(t_block *block,size_t size, t_heap *heap)
         heap->free_size -= sizeof(t_block);
     }
     block->free = 0;
-    heap->free_size -= block->size - sizeof(t_block);
+    heap->free_size -= block->size;
     return block;
 }
 
@@ -112,4 +112,23 @@ void setup_block(t_block *block, size_t size)
     block->next = NULL;
     block->free = 0;
     block->size = size;
+}
+
+int    grow_into_next_block(t_block *block, t_heap *heap, size_t size)
+{
+    size_t combined;
+    combined = block->size + sizeof(t_block) + block->next->size;
+    if (combined >= size)
+    {
+        t_block *next = block->next;
+        block->size = combined;
+        block->next = next->next;
+        if (next->next)
+            next->next->prev = block;
+        heap->block_count--;
+        heap->free_size += sizeof(t_block);
+        split_block(block, size, heap);
+        return 1;
+    }
+    return 0;
 }
