@@ -1,94 +1,130 @@
 #include <errno.h>
 #include <string.h>
-#include "../inc/malloc.h"
+#include "../libft/libft.h"
 #include <assert.h>
 #include <stdint.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/wait.h>
 
 #define NUM_ALLOCATIONS 1000
+
+__attribute__((visibility("default")))
+void show_alloc_mem();
+
+typedef struct s_allocs {
+    char *tiny;
+    char *small;
+    char *large;
+} t_allocs;
+
+void *free_allocs(void *arg)
+{
+    t_allocs *allocs = (t_allocs *)arg;
+
+    ft_putendl_fd("Freeing allocations in thread...", 1);
+
+    if (allocs->tiny) free(allocs->tiny);
+    if (allocs->small) free(allocs->small);
+    if (allocs->large) free(allocs->large);
+
+    ft_putendl_fd("Memory freed in thread. Showing memory:", 1);
+    show_alloc_mem();
+
+    return NULL;
+}
 
 int is_aligned_16(void *ptr)
 {
     return ((uintptr_t)ptr & 0xF) == 0;
 }
 
-int main(void) {
-    ft_putstr(" Tiny allocation test \n");
-    char *tiny = malloc(64);
-    assert(tiny);
-    memcpy(tiny, "tiny test", 10);
-    ft_putstr("Tiny block at: ");
+int main() {
+    pthread_t tid;
+    t_allocs allocs;
+
+    allocs.tiny = malloc(64);
+    assert(allocs.tiny);
+    memcpy(allocs.tiny, "tiny test", 10);
+
+    allocs.small = malloc(512);
+    assert(allocs.small);
+    memcpy(allocs.small, "small test", 11);
+
+    allocs.large = malloc(20000);
+    assert(allocs.large);
+    memcpy(allocs.large, "large test", 11);
+
+    ft_putendl_fd("\nMain thread: Memory allocated.", 1);
     show_alloc_mem();
-    free(tiny);
 
-    ft_putstr(" Small allocation test \n");
-    char *small = malloc(512);
-    assert(small);
-    memcpy(small, "small test", 11);
-    ft_putstr("Small block at: ");
+    if (pthread_create(&tid, NULL, free_allocs, &allocs) != 0)
+    {
+        ft_putendl_fd("Failed to create thread", 2);
+        exit(1);
+    }
+
+    pthread_join(tid, NULL);
+
+    ft_putendl_fd("Back in main thread. Showing memory:", 1);
     show_alloc_mem();
-    free(small);
 
-    ft_putstr(" Large allocation test \n");
-    char *large = malloc(20000);
-    assert(large);
-    memcpy(large, "large test", 11);
-    ft_putstr("Large block at: ");
-    show_alloc_mem();
-    free(large);
-
-
-    ft_putstr(" 0-byte allocation test \n");
+    ft_putendl_fd(" \n---0-byte allocation test", 1);
     void *zero = malloc(0);
-    ft_putstr("0-byte malloc returned: ");
-    show_alloc_mem();
-    free(zero);
+    if (!zero)
+        ft_putendl_fd("Allocation is NULL\n", 1);
 
-    ft_putstr(" Alignment test \n");
+    ft_putendl_fd(" ---Alignment test ", 1);
     void *aligned = malloc(31);
-    if (((size_t)aligned & 0xF) == 0)
-        ft_putstr("Aligned pointer at: ");
-    show_alloc_mem();
+    if (((size_t)aligned & 0xF) != 0)
+    {
+        ft_putendl_fd("Not aligned!!!", 2);
+        exit(1);
+    }
+    ft_putendl_fd("Memory is aligned.\n", 1);
     free(aligned);
 
-    ft_putstr(" Multiple allocations \n");
+    ft_putendl_fd(" ---Multiple allocations", 1);
     char *arr[NUM_ALLOCATIONS];
-    for (int i = 0; i < NUM_ALLOCATIONS; i++) {
+    for (int i = 0; i < NUM_ALLOCATIONS; i++)
+    {
         arr[i] = malloc(128);
         assert(arr[i]);
         arr[i][0] = 'a';
         free(arr[i]);
     }
-    show_alloc_mem();
-    ft_putstr("Finished allocating multiple blocks.\n");
 
-    ft_putstr(" Heap growth test \n");
+    ft_putendl_fd("Finished allocating multiple blocks.\n", 1);
+
+    ft_putendl_fd(" ---Heap growth test", 1);
     for (int i = 0; i < 100; i++) {
         void *ptr = malloc(4096);
         assert(ptr);
         free(ptr);
     }
-    show_alloc_mem();
-    ft_putstr("Heap growth test passed.\n");
 
-    ft_putstr(" Block overwrite test \n");
+    ft_putendl_fd("Heap growth test passed.\n", 1);
+
+    ft_putendl_fd(" ---Block overwrite test", 1);
     char *buf = malloc(16);
     assert(buf);
     memset(buf, 'X', 15);
     buf[15] = '\0';
-    show_alloc_mem();
     free(buf);
-    ft_putstr("Overwrite done.\n");
+    ft_putendl_fd("Overwrite done.\n", 1);
 
-    ft_putstr(" Integer content test \n");
+    ft_putendl_fd(" ---Integer alloc test", 1);
     int *nums = malloc(5 * sizeof(int));
     assert(nums);
-    for (int i = 0; i < 5; i++) nums[i] = i * 10;
-    for (int i = 0; i < 5; i++) assert(nums[i] == i * 10);
-    show_alloc_mem();
+    for (int i = 0; i < 5; i++)
+        nums[i] = i * 10;
+    for (int i = 0; i < 5; i++)
+        assert(nums[i] == i * 10);
     free(nums);
-    ft_putstr("Stored integers successfully.\n");
+    ft_putendl_fd("Stored integers successfully.\n", 1);
 
-    ft_putstr(" All tests passed \n");
+    ft_putendl_fd(" All tests passed \n", 1);
+
     return 0;
 }
 

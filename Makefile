@@ -14,7 +14,7 @@ LDFLAGS     := -shared -L$(LIBFT_DIR)
 SRCDIR      := src
 OBJDIR      := obj
 INCDIR      := inc
-SRCS        := $(wildcard $(SRCDIR)/*.c)
+SRCS        := src/block.c  src/free.c  src/heap.c  src/malloc.c  src/realloc.c  src/show_alloc_mem.c  src/utils.c
 OBJS        := $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 
@@ -44,12 +44,9 @@ libft:
 test: $(TESTBIN)
 
 $(TESTBIN): $(TESTSRC)
-	@$(CC) $(TESTFLAGS) $< -o $@
+	@$(CC) $(TESTFLAGS) $< -o $@ -L$(LIBFT_DIR) -lft ./libft_malloc.so
 run: all test
 	@LD_PRELOAD=./$(LINK_NAME) ./$(TESTBIN)
-
-valgrind: all test
-	@LD_PRELOAD=./$(LINK_NAME) valgrind ./$(TESTBIN)
 
 clean:
 	@rm -rf $(OBJDIR)
