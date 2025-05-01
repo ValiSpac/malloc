@@ -1,0 +1,53 @@
+# ft_malloc
+
+This project is a custom implementation of the `malloc`, `free`, and `realloc` functions in C. It aims to mimic the behavior of the standard memory allocator.
+
+## Project Goals
+
+- Implement a working version of:
+  - `malloc(size_t size)`
+  - `free(void *ptr)`
+  - `realloc(void *ptr, size_t size)`
+- Track and organize memory blocks by size (TINY, SMALL, LARGE).
+- Handle memory alignment and fragmentation.
+- Create a debug function `show_alloc_mem()` to display current memory allocations.
+
+## Technical Overview
+
+- Memory is allocated using `mmap()` for large chunks.
+- Freed memory is reused when possible.
+- Zones are categorized by size:
+  - **TINY**: allocations ≤ 128 bytes
+  - **SMALL**: allocations ≤ 1024 bytes
+  - **LARGE**: allocations > 1024 bytes
+- Blocks are 16-byte aligned.
+
+## Tests
+
+Several test cases are included in `main.c` to verify
+
+## How to Compile
+
+To compile the project and run tests:
+
+```bash
+make
+make run
+```
+
+## Output Example
+```
+TINY: 0x00007FDF64A71000
+0x00007FDF64A71060-0x00007FDF64A710A0: 64 bytes
+SMALL: 0x00007FDF64811000
+0x00007FDF64811060-0x00007FDF64811260: 512 bytes
+LARGE: 0x00007FDF64A6C000
+0x00007FDF64A6C060-0x00007FDF64A70E80: 20000 bytes
+```
+
+## Bonus
+- Added a thread to free the memory in the test
+- Memory defragmentation(reusing, resizing and joining blocks of memory when needed)
+
+
+
