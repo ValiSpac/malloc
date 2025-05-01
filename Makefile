@@ -45,7 +45,6 @@ test: $(TESTBIN)
 
 $(TESTBIN): $(TESTSRC)
 	@$(CC) $(TESTFLAGS) $< -o $@
-
 run: all test
 	@LD_PRELOAD=./$(LINK_NAME) ./$(TESTBIN)
 

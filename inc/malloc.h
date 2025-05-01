@@ -63,3 +63,4 @@ void        print_size(size_t n);
 int         is_heap_empty(t_heap *heap);
 t_heap      *find_heap_from_block(t_block *block);
 size_t      get_system_limit();
+void        show_alloc_mem();
